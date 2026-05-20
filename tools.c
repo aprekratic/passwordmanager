@@ -1,12 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "library.h"
-
-void clearScreen(void) {
-    #ifdef _WIN32
-        system("cls");
-    #else
-        system("clear");
-    #endif
-}
 
 void clearBuff(void)
 {
@@ -20,27 +13,25 @@ void pressEnter(void)
     clearBuff();
 }
 
-int safeInput(char *buff, int maxlen, const char *prompt)
+int storageSave(const Vault* v)
 {
-    if (buff == NULL || maxlen <= 0) {
-        return -1;
+    if (v == NULL)
+        return 0;
+    FILE* fp = fopen(VAULT_FILE, "w");
+    if (fp == NULL) {
+        perror("storageSave: fopen");
+        return 0;
     }
-    if (prompt != NULL && prompt[0] != '\0') {
-        printf("%s", prompt);
+       
+    for (int i = 0; i < v->count; i++) {
+        if (fprintf(fp, "%s[%s]%s\n", v->entries[i].site, v->entries[i].username, v->entries[i].password < 0)) {
+            perror("storageSave: fprintf");
+            fclose(fp);
+            return 0;
+        }
     }
-    if (fget(buff, maxlen, stdin) == NULL) {
-        buff[0] = '\0';
-        return -1;
-    }
-
-    int len = (int)strlen(buff);
-    if (len > 0 && buff[len - 1] == '\n') {
-        buff[--len] = '\0';
-    } else {
-        clearBuff();
-    }
-
-   return len;
+    fclose(fp);
+    return 1;
 }
 
 
