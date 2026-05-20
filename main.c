@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "library.h"
 
 int main(void)
@@ -8,16 +9,7 @@ int main(void)
 
 
     /*prijava*/
-    int tries = 0;
-    while (tries < MAX_LOGIN_TRIES) {
-        if (authLogin()) break;
-        tries++;
-        if (tries < MAX_LOGIN_TRIES)
-        printf("Pokusaj %d/%d. Pokusati ponovno.\n\n", tries, MAX_LOGIN_TRIES);
-    }
-    if (tries >= MAX_LOGIN_TRIES) {
-        fprintf(stderr, "Previse pogresnih pokusaja. Izlaz.\n");
-        return EXIT_FAILURE;
+    while (authLogin() == 0) {
     }
 
     printf("Prijava uspjesna.\n");
@@ -25,7 +17,7 @@ int main(void)
     /*kreiranje trezora*/
     Vault* vault = vaultCreate();
     if (vault == NULL) {
-        fprintf(stderr, "Greska: Trezor nije moguce alocirati.\n");
+        fprintf(stderr, "vault create\n");
         return EXIT_FAILURE;
     }
 
