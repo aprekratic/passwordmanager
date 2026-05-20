@@ -18,12 +18,12 @@
 
 
 typedef enum {
-MENU_EXIT = 0,
 MENU_VIEW_ALL = 1,
 MENU_VIEW_ONE = 2,
 MENU_ADD = 3,
 MENU_DELETE = 4,
 MENU_GENERATE = 5,
+MENU_EXIT = 6,
 } MenuOption;
 
 typedef struct {
@@ -42,10 +42,9 @@ Vault* vaultCreate(void);
 void vaultPrintAll(const Vault* v);
 int authSetup(void);
 int authLogin(void);
-void clearScreen(void);
 void clearBuff(void);
 void pressEnter(void);
-int toolsSafeInput(char *buff, int maxlen, const char *prompt);
+int storageSave(const Vault* v);
 void menuMain(Vault *v);
 
 #endif
