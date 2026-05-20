@@ -6,7 +6,7 @@ Vault* vaultCreate(void)
     Vault* v = (Vault*)malloc(sizeof(Vault));
     if (v == NULL)
     {
-        perror("Greska pri alokaciji memorije");
+        perror("malloc vault");
         return NULL;
     }
 
@@ -23,28 +23,18 @@ Vault* vaultCreate(void)
 
 }
 
-void vaultPrintAll(const Vault* v)
-{
-    if (v == NULL || v->count == 0)
-    {
-        printf("Nema spremljenih unosa.\n");
-        return;
-    }
-}
-
 static void showMenu(void)
 {
-    toolsClearScreen();
-    printf("\n----------------------------------");
-    printf("     UPRAVITELJ LOZINKAMA\n");
-    printf("------------------------------------\n");
+    printf("\n---- ");
+    printf("UPRAVITELJ LOZINKAMA ");
+    printf("-----\n");
     printf("  1. Prikazi sve unose\n");
     printf("  2. Prikazi konkretnu lozinku\n");
     printf("  3. Dodaj novi unos\n");
     printf("  4. Obrisi unos\n");
     printf("  5. Generiraj lozinku\n");
-    printf("  0. Izlaz\n");
-    printf("------------------------------------\n");
+    printf("  6. Izlaz\n");
+    printf("----------------------------\n");
     printf("Odabir: ");
 }
 
@@ -54,7 +44,7 @@ void menuMain(Vault *v)
     do {
         showMenu();
         scanf("%d", &choice);
-        toolsFlushInput();
+        clearBuff();
 
         switch (choice) {
             case MENU_VIEW_ALL:
@@ -64,48 +54,58 @@ void menuMain(Vault *v)
                 /* */
                 break;
             case MENU_ADD:
-                doAdd(v);
+                addEntry(v);
                 break;
             case MENU_DELETE:
-                doDelete(v);
+               /*deleteEntry(v);*/
                 break;
             case MENU_GENERATE:
-                doGenerate();
+                /*generatePassword();*/
                 break;
             case MENU_EXIT:
                 printf("Izlaz iz programa.\n");
                 break;
             default:
                 printf("Nepoznata opcija.\n");
-                toolsPressEnter();
+                pressEnter();
                 break;
         }
     } while (choice != MENU_EXIT);
 }
+void vaultPrintAll(const Vault* v)
+{
+    if (v == NULL || v->count == 0)
+    {
+        printf("Nema spremljenih unosa.\n");
+        return;
+    }
+}
 
-
-static void doAdd(Vault *v)
+static void addEntry(Vault* v)
 {
     char site[MAX_SITE_LEN];
     char user[MAX_USER_LEN];
     char pass[MAX_PASS_LEN];
-    char choice[4];
+    printf("\n---- Dodavanje unosa -----\n");
+    printf("Naziv stranice: ");
+    scanf("%s", site);
+    clearBuff();
 
-    toolsClearScreen();
-    printf("\n=== Dodavanje unosa ===\n");
-    toolsSafeInput(site, MAX_SITE_LEN, "Naziv stranice:  ");
-    toolsSafeInput(user, MAX_USER_LEN, "Korisnicko ime:  ");
-    toolsSafeInput(pass, MAX_PASS_LEN, "Lozinka: ");
+    printf("Korisnicko ime: ");
+    scanf("%s", user);
+    clearBuff();
 
+    printf("Lozinka: ");
+    scanf("%s", pass);
+    clearBuff();
+
+    /*
     if (vaultAdd(v, site, user, pass)) {
-        if (storageSave(v)) 
-        {
+        if (storageSave(v)) {
             printf("Unos dodan i spremljen.\n");
-            } else {
-            printf("Unos dodan ali NIJE spremljen!\n");
+        } else {
+            printf("Unos nije spremljen.");
         }
-    toolsPressEnter();
-
-    /*dodati autogeneriranje lozinke*/
     }
+    */
 }
