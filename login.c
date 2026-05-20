@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "library.h"
 
 int authSetup(void)
@@ -5,7 +6,9 @@ int authSetup(void)
     char pass[MAX_PASS_LEN];
 
     printf("\n=== Postavljanje master lozinke ===\n");
-    safeInput(pass, MAX_PASS_LEN, "Nova lozinka: ");
+    printf("Nova lozinka: ");
+    scanf("%63s", pass);
+    clearBuff();
 
     FILE *fp = fopen(MASTER_FILE, "w");
     if (fp == NULL) {
@@ -21,5 +24,15 @@ int authSetup(void)
 
 int authLogin(void)
 {
+    static int loginAttempts = 0;
+    if (loginAttempts >= MAX_LOGIN_TRIES) {
+        printf("Previse pogresnih pokusaja. Izlaz.\n");
+        return 0;
+    }
 
+    FILE* fp = fopen(MASTER_FILE, "r");
+    if (fp == NULL) {
+        printf("Nije postavljena master lozinka. Postavljanje.\n");
+        return authSetup();
+    }
 }
