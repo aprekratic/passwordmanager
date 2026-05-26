@@ -16,6 +16,8 @@
 #define MASTER_FILE "master.dat"
 #define VAULT_FILE "vault.dat"
 
+extern int brojUnosa;
+
 
 typedef enum {
 MENU_VIEW_ALL = 1,
@@ -38,13 +40,22 @@ int count;
 int capacity;
 } Vault;
 
+
+
+static inline void pressEnter(void)
+{
+    printf("\nPritisni enter za nastavak...");
+    clearBuff();
+}
+
 Vault* vaultCreate(void);
 void vaultPrintAll(const Vault* v);
 int authSetup(void);
 int authLogin(void);
 void clearBuff(void);
-void pressEnter(void);
 int storageSave(const Vault* v);
 void menuMain(Vault *v);
+void vaultDestroy(Vault* v);
+int vaultAdd(Vault* v, const char* site, const char* user, const char* pass);
 
 #endif

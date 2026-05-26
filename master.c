@@ -15,6 +15,7 @@ int authSetup(void)
         perror("authSetup: fopen");
         return 0;
     }
+
     fprintf(fp, "%s\n", pass);
     fclose(fp);
 
@@ -24,15 +25,33 @@ int authSetup(void)
 
 int authLogin(void)
 {
-    static int loginAttempts = 0;
-    if (loginAttempts >= MAX_LOGIN_TRIES) {
+    static int pokusaji = 0;
+
+    if (pokusaji >= MAX_LOGIN_TRIES) {
         printf("Previse pogresnih pokusaja. Izlaz.\n");
         return 0;
     }
 
-    FILE* fp = fopen(MASTER_FILE, "r");
+    FILE *fp = fopen(MASTER_FILE, "r");
     if (fp == NULL) {
         printf("Nije postavljena master lozinka. Postavljanje.\n");
         return authSetup();
     }
+
+    char stored[MAX_PASS_LEN];
+    fscanf(fp, "%63s", stored);
+    fclose(fp);
+
+    char input[MAX_PASS_LEN];
+    printf("Master lozinka: ");
+    scanf("%63s", input);
+    clearBuff();
+
+    if (strcmp(input, stored) != 0) {
+        pokusaji++;
+        printf("Pogresna lozinka. Pokusaj %d/%d.\n", pokusaji, MAX_LOGIN_TRIES);
+        return 0;
+    }
+
+    return 1;
 }
