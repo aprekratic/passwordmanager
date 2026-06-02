@@ -1,0 +1,78 @@
+1. CRUID
+2. odabir konkretnih primitivnih tipova podataka za rad s cjelobrojnim i realnim konstantama
+int odabir;
+3. složeni tipovi podataka
+char pass[MAX_PASS_LEN];
+4. primjena typedef
+typedef struct {
+	char site[MAX_SITE_LEN];
+	char username[MAX_USER_LEN];
+	char password[MAX_PASS_LEN];
+} Entry;
+5. imenovanje identifikatora (varijabli, konstanti, polja, funkcija, pokazivača...)
+int odabir;
+char username[MAX_USER_LEN];
+void vaultPrintAll(const Vault* v);
+6. primjena kljucne rijeci static za lokalne i globalne varijable
+static int pokusaji = 0;
+static int inicijalniKapacitet = 8;
+7. organizacija izvornog koda
+library.h, main.c, master.c, vault.c
+8. primjena extern kljucne rijeci
+extern int brojUnosa;
+10. izbornik
+11. izbornik enum tipa
+typedef enum {
+	MENU_VIEW_ALL = 1,
+	MENU_VIEW_ONE = 2,
+	MENU_ADD = 3,
+	MENU_DELETE = 4,
+	MENU_GENERATE = 5,
+	MENU_EXIT = 6,
+} MenuOption;
+12. upotreba pokazivaca gdje su potrebni
+
+Vault* vault = vaultCreate();
+13. upotreba struktura i funkcija
+typedef struct {
+	Entry* entries;
+	int count;
+	int capacity;
+} Vault;
+
+Vault* vaultCreate(void);
+
+14. zaštita parametara kod svih funkcija
+if (fp == NULL) {
+		perror("authSetup: fopen");
+		return 0;
+	}
+if (v == NULL)
+	{
+		perror("malloc vault");
+		return NULL;
+	}
+15. statički zauzeta polja
+char potvrda[4];
+16. dinamičko zauzimanje memorije za bilo koji tip podatka, osobito složene
+Vault* v = (Vault*)malloc(sizeof(Vault));
+17. koristiti funkcije malloc(),calloc(), realloc(), free()
+v->entries = (Entry*)calloc(inicijalniKapacitet, sizeof(Entry));
+18. sigurno brisanje memorije koja je dinamički zauzeta, anuliranje memorijskog prostora
+free(v->entries);
+v->entries = NULL;
+
+19. datoteke - binarna, provjera pokazivaca i zatvaranje datoteke
+FILE* fp = fopen(VAULT_FILE, "w");
+	if (fp == NULL) {
+		perror("storageSave: fopen");
+		return 0;
+	}
+	fclose(fp);
+
+22. upravljanje s pogreskama - stderr, perror
+if (v == NULL) {
+	perror("Greska pri alokaciji memorije");
+	return NULL;
+}
+ 
