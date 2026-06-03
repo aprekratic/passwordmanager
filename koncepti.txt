@@ -19,7 +19,7 @@ static int inicijalniKapacitet = 8;
 7. organizacija izvornog koda
 library.h, main.c, master.c, vault.c
 8. primjena extern kljucne rijeci
-extern int brojUnosa;
+extern int broj_unosa;
 
 9. ako su funkcije jednostavne koristiti makro ili inline funkcije
 static inline void pressEnter(void)
