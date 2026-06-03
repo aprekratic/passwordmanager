@@ -20,6 +20,14 @@ static int inicijalniKapacitet = 8;
 library.h, main.c, master.c, vault.c
 8. primjena extern kljucne rijeci
 extern int brojUnosa;
+
+9. ako su funkcije jednostavne koristiti makro ili inline funkcije
+static inline void pressEnter(void)
+{
+	printf("\nPritisni enter za nastavak...");
+	clearBuff();
+}
+
 10. izbornik
 11. izbornik enum tipa
 typedef enum {
@@ -33,6 +41,7 @@ typedef enum {
 12. upotreba pokazivaca gdje su potrebni
 
 Vault* vault = vaultCreate();
+
 13. upotreba struktura i funkcija
 typedef struct {
 	Entry* entries;
@@ -54,10 +63,13 @@ if (v == NULL)
 	}
 15. statički zauzeta polja
 char potvrda[4];
+
 16. dinamičko zauzimanje memorije za bilo koji tip podatka, osobito složene
 Vault* v = (Vault*)malloc(sizeof(Vault));
+
 17. koristiti funkcije malloc(),calloc(), realloc(), free()
 v->entries = (Entry*)calloc(inicijalniKapacitet, sizeof(Entry));
+
 18. sigurno brisanje memorije koja je dinamički zauzeta, anuliranje memorijskog prostora
 free(v->entries);
 v->entries = NULL;
@@ -70,9 +82,37 @@ FILE* fp = fopen(VAULT_FILE, "w");
 	}
 	fclose(fp);
 
+20. koristiti funkije fseek(), ftell(), rewind(), ovisno o potrebi
+fseek(fp, 0, SEEK_END);
+long velicina = ftell(fp);
+rewind(fp);
+
+21. koristiti funkcije remove(), rename() 
+fclose(fp);
+remove(VAULT_FILE);
+rename("vault_temp.dat", VAULT_FILE);
+
 22. upravljanje s pogreskama - stderr, perror
 if (v == NULL) {
 	perror("Greska pri alokaciji memorije");
 	return NULL;
 }
- 
+
+23. sortiranje
+qsort(v->entries, (size_t)v->count, sizeof(Entry), compareEntries);
+
+24. pretraživanje 
+Entry* pronadjen = (Entry*)bsearch(&key, v->entries,
+	(size_t)v->count, sizeof(Entry),
+	compareEntries);
+
+25. rekurzija
+void vaultPrintRecursive(const Vault* v, int index)
+{
+	if (v == NULL || index >= v->count) return;
+	printf("%-4d  %-20s  %-20s\n", index + 1, v->entries[index].site, v->entries[index].username);
+	vaultPrintRecursive(v, index + 1);
+}
+
+26. funkije qsort() ili bsearch()
+qsort(v->entries, (size_t)v->count, sizeof(Entry), compareEntries);
