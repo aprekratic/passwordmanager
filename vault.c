@@ -1,8 +1,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "library.h"
 
-int brojUnosa = 0;
-static int inicijalniKapacitet = 8;
+int broj_unosa = 0;
+static int kapacitet = 8;
 
 void clearBuff(void)
 {
@@ -14,63 +14,63 @@ int storageSave(const Vault* v)
 {
 	if (v == NULL) return 0;
 
-    FILE* fp = fopen("vault_temp.dat", "w");
-    if (fp == NULL) {
-        perror("storageSave: fopen");
-        return 0;
-    }
+	FILE* fp = fopen("vault_temp.dat", "w");
+	if (fp == NULL) {
+		perror("storageSave: fopen");
+		return 0;
+	}
 
-    for (int i = 0; i < v->count; i++) {
-        if (fprintf(fp, "%s|%s|%s\n", v->entries[i].site, v->entries[i].username, v->entries[i].password) < 0) {
-            perror("storageSave: fprintf");
-            fclose(fp);
-            return 0;
-        }
-    }
+	for (int i = 0; i < v->count; i++) {
+		if (fprintf(fp, "%s|%s|%s\n", v->entries[i].site, v->entries[i].username, v->entries[i].password) < 0) {
+			perror("storageSave: fprintf");
+			fclose(fp);
+			return 0;
+		}
+	}
 
-    fclose(fp);
-    remove(VAULT_FILE);
-    rename("vault_temp.dat", VAULT_FILE);
+	fclose(fp);
+	remove(VAULT_FILE);
+	rename("vault_temp.dat", VAULT_FILE);
 	return 1;
 }
 
 static int compareEntries(const void* a, const void* b)
 {
-    return strcmp(((const Entry*)a)->site, ((const Entry*)b)->site);
+	return strcmp(((const Entry*)a)->site, ((const Entry*)b)->site);
 }
 
 int storageLoad(Vault* v)
 {
-    if (v == NULL) return -1;
+	if (v == NULL) return -1;
 
-    FILE* fp = fopen(VAULT_FILE, "r");
-    if (fp == NULL) {
-        return 0;
-    }
+	FILE* fp = fopen(VAULT_FILE, "r");
+	if (fp == NULL) {
+		return 0;
+	}
 
-    fseek(fp, 0, SEEK_END);
-    long velicina = ftell(fp);
-    rewind(fp);
+	fseek(fp, 0, SEEK_END);
+	long velicina = ftell(fp);
+	rewind(fp);
 
-    if (velicina == 0) {
-        fclose(fp);
-        return 0;
-    }
+	if (velicina == 0) {
+		fclose(fp);
+		return 0;
+	}
 
-    char site[MAX_SITE_LEN];
-    char user[MAX_USER_LEN];
-    char pass[MAX_PASS_LEN];
-    int ucitano = 0;
+	char site[MAX_SITE_LEN];
+	char user[MAX_USER_LEN];
+	char pass[MAX_PASS_LEN];
+	int ucitano = 0;
 
-    while (fscanf(fp, "%63[^|]|%63[^|]|%63[^\n]\n",
-                  site, user, pass) == 3) {
-        vaultAdd(v, site, user, pass);
-        ucitano++;
-    }
+	while (fscanf(fp, "%63[^|]|%63[^|]|%63[^\n]\n",
+		site, user, pass) == 3) {
+		vaultAdd(v, site, user, pass);
+		ucitano++;
+	}
 
-    fclose(fp);
-    qsort(v->entries, (size_t)v->count, sizeof(Entry), compareEntries);
-    return ucitano;
+	fclose(fp);
+	qsort(v->entries, (size_t)v->count, sizeof(Entry), compareEntries);
+	return ucitano;
 }
 
 Vault* vaultCreate(void)
@@ -82,7 +82,7 @@ Vault* vaultCreate(void)
 		return NULL;
 	}
 
-	v->entries = (Entry*)calloc(inicijalniKapacitet, sizeof(Entry));
+	v->entries = (Entry*)calloc(kapacitet, sizeof(Entry));
 	if (v->entries == NULL)
 	{
 		perror("calloc entries");
@@ -90,15 +90,15 @@ Vault* vaultCreate(void)
 		return NULL;
 	}
 	v->count = 0;
-	v->capacity = inicijalniKapacitet;
+	v->capacity = kapacitet;
 	return v;
 }
 
 void vaultPrintRecursive(const Vault* v, int index)
 {
-    if (v == NULL || index >= v->count) return;
-    printf("%-4d  %-20s  %-20s\n", index + 1, v->entries[index].site, v->entries[index].username);
-    vaultPrintRecursive(v, index + 1);
+	if (v == NULL || index >= v->count) return;
+	printf("%-4d  %-20s  %-20s\n", index + 1, v->entries[index].site, v->entries[index].username);
+	vaultPrintRecursive(v, index + 1);
 }
 
 void vaultPrintAll(const Vault* v)
@@ -115,25 +115,25 @@ void vaultPrintAll(const Vault* v)
 
 void vaultPrintOne(const Vault* v, const char* site)
 {
-    if (v == NULL || site == NULL || v->count == 0) return;
+	if (v == NULL || site == NULL || v->count == 0) return;
 
-    Entry key;
-    memset(&key, 0, sizeof(key));
-    strncpy(key.site, site, MAX_SITE_LEN - 1);
+	Entry key;
+	memset(&key, 0, sizeof(key));
+	strncpy(key.site, site, MAX_SITE_LEN - 1);
 
-    Entry* found = (Entry*)bsearch(&key, v->entries,
-                                   (size_t)v->count, sizeof(Entry),
-                                   compareEntries);
-    if (found == NULL) {
-        printf("Unos '%s' nije pronadjen.\n", site);
-        return;
-    }
+	Entry* pronadjen = (Entry*)bsearch(&key, v->entries,
+		(size_t)v->count, sizeof(Entry),
+		compareEntries);
+	if (pronadjen == NULL) {
+		printf("Unos '%s' nije pronadjen.\n", site);
+		return;
+	}
 
-    printf("\n----------------------------\n");
-    printf("  Stranica:       %s\n", found->site);
-    printf("  Korisnicko ime: %s\n", found->username);
-    printf("  Lozinka:        %s\n", found->password);
-    printf("----------------------------\n");
+	printf("\n----------------------------\n");
+	printf("  Stranica:       %s\n", pronadjen->site);
+	printf("  Korisnicko ime: %s\n", pronadjen->username);
+	printf("  Lozinka:        %s\n", pronadjen->password);
+	printf("----------------------------\n");
 }
 
 int vaultAdd(Vault* v, const char* site, const char* user, const char* pass)
@@ -146,19 +146,30 @@ int vaultAdd(Vault* v, const char* site, const char* user, const char* pass)
 
 	for (int i = 0; i < v->count; i++) {
 		if (strcmp(v->entries[i].site, site) == 0) {
-			printf("Unos za '%s' vec postoji.\n", site);
+			char potvrda[4];
+			printf("Unos za '%s' vec postoji. Azurirati (d/n)?: \n", site);
+			scanf("%3s", potvrda);
+			clearBuff();
+			if (potvrda[0] == 'd' || potvrda[0] == 'D') {
+				printf("Novi username: ");
+				scanf("%63s", v->entries[i].username);
+				printf("Nova lozinka: ");
+				scanf("%63s", v->entries[i].password);
+				clearBuff();
+				return 1;
+			}
 			return 0;
 		}
 	}
 
 	if (v->count >= v->capacity) {
 		int new_cap = v->capacity * 2;
-		Entry* tmp = (Entry*)realloc(v->entries, (size_t)new_cap * sizeof(Entry));
-		if (tmp == NULL) {
+		Entry* temp = (Entry*)realloc(v->entries, (size_t)new_cap * sizeof(Entry));
+		if (temp == NULL) {
 			perror("realloc entries");
 			return 0;
 		}
-		v->entries = tmp;
+		v->entries = temp;
 		v->capacity = new_cap;
 	}
 
@@ -169,9 +180,9 @@ int vaultAdd(Vault* v, const char* site, const char* user, const char* pass)
 	v->entries[v->count].username[MAX_USER_LEN - 1] = '\0';
 	v->entries[v->count].password[MAX_PASS_LEN - 1] = '\0';
 	v->count++;
-	brojUnosa++;
+	broj_unosa++;
 
-    qsort(v->entries, (size_t)v->count, sizeof(Entry), compareEntries);
+	qsort(v->entries, (size_t)v->count, sizeof(Entry), compareEntries);
 	return 1;
 }
 
@@ -244,7 +255,7 @@ static void deleteEntry(Vault* v)
 			memset(&v->entries[v->count - 1], 0, sizeof(Entry));
 			v->count--;
 			pronadjen = 1;
-			brojUnosa--;
+			broj_unosa--;
 			break;
 		}
 	}
@@ -265,32 +276,32 @@ static void deleteEntry(Vault* v)
 
 static void generatePassword(void)
 {
-    char pass[33];
-    int duljina, i;
+	char pass[33];
+	int duljina, i;
 
-    printf("\n---- Generator lozinki -----\n");
-    printf("Duljina (8-32): ");
-    scanf("%d", &duljina);
-    clearBuff();
+	printf("\n---- Generator lozinki -----\n");
+	printf("Duljina (8-32): ");
+	scanf("%d", &duljina);
+	clearBuff();
 
-    if (duljina < 8)  duljina = 8;
-    if (duljina > 32) duljina = 32;
+	if (duljina < 8)  duljina = 8;
+	if (duljina > 32) duljina = 32;
 
-    srand((unsigned int)time(NULL));
+	srand((unsigned int)time(NULL));
 
-    for (i = 0; i < duljina; i++) {
-        int tip = rand() % 3;
-        if (tip == 0)
-            pass[i] = 'a' + rand() % 26;
-        else if (tip == 1)
-            pass[i] = 'A' + rand() % 26;
-        else
-            pass[i] = '0' + rand() % 10;
-    }
-    pass[duljina] = '\0';
+	for (i = 0; i < duljina; i++) {
+		int tip = rand() % 3;
+		if (tip == 0)
+			pass[i] = 'a' + rand() % 26;
+		else if (tip == 1)
+			pass[i] = 'A' + rand() % 26;
+		else
+			pass[i] = '0' + rand() % 10;
+	}
+	pass[duljina] = '\0';
 
-    printf("Generirana lozinka: %s\n", pass);
-    pressEnter();
+	printf("Generirana lozinka: %s\n", pass);
+	pressEnter();
 }
 
 static void showMenu(void)
@@ -322,15 +333,15 @@ void menuMain(Vault* v)
 			pressEnter();
 			break;
 		case MENU_VIEW_ONE:
-			{
-            char site[MAX_SITE_LEN];
-            printf("Naziv stranice: ");
-            scanf("%63s", site);
-            clearBuff();
-            vaultPrintOne(v, site);
-            pressEnter();
-            break;
-            }
+		{
+			char site[MAX_SITE_LEN];
+			printf("Naziv stranice: ");
+			scanf("%63s", site);
+			clearBuff();
+			vaultPrintOne(v, site);
+			pressEnter();
+			break;
+		}
 		case MENU_ADD:
 			addEntry(v);
 			break;
