@@ -38,8 +38,8 @@ int authLogin(void)
 		return authSetup();
 	}
 
-	char stored[MAX_PASS_LEN];
-	fscanf(fp, "%63s", stored);
+	char spremljeno[MAX_PASS_LEN];
+	fscanf(fp, "%63s", spremljeno);
 	fclose(fp);
 
 	char input[MAX_PASS_LEN];
@@ -47,7 +47,7 @@ int authLogin(void)
 	scanf("%63s", input);
 	clearBuff();
 
-	if (strcmp(input, stored) != 0) {
+	if (strcmp(input, spremljeno) != 0) {
 		pokusaji++;
 		printf("Pogresna lozinka. Pokusaj %d/%d.\n", pokusaji, MAX_LOGIN_TRIES);
 		return 0;
