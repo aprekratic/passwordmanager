@@ -16,7 +16,7 @@
 #define MASTER_FILE "master.dat"
 #define VAULT_FILE "vault.dat"
 
-extern int brojUnosa;
+extern int broj_unosa;
 
 typedef enum {
 	MENU_VIEW_ALL = 1,
